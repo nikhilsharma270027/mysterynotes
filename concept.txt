@@ -1,0 +1,41 @@
+Mostly, the edge time framework is something where the entire resource, the whole application, doesn't run continuously. Things execute as user requests come in, and especially in Next.js, all the functions you write run on-demand. But when you create a pure, dedicated backend application, once things are connected and running, they continue to run continuously. This mindset needs to be understood first. Even if you've seen many Next.js tutorials and courses, until you grasp this basic difference in your mind, you won't be able to fully utilize this framework.
+
+Always remember that things are not always running in Next.js. They run as the demand is created. Now, why did I tell this whole story? The reason is that since your application isn't running all the time, the first thing is that the database connection isn't always connected. The database connection is established as requests are made.
+
+Sometimes, it can happen that you made a request now and then made another request two seconds later. It's possible that the database connection is already executed. If you still take the database connection even when it's already there, you will choke the application because you are taking too many database connections. So whenever you build a Next.js application, always check first if the database connection already exists. If it does, use that connection; if not, create a new connection.
+
+This small difference separates a basic Next.js tutorial where you just write code and make something, and a tutorial where you actually understand the things. This is the small difference that makes a difference.
+
+So, let's share the screen now. You've understood enough now. It's not rocket science, it's all easy. Let's close everything first.
+
+Alright, one more small thing by the way. Let's close this schema now. Here, I actually want to create a new file folder. So let's create a folder now. I've named this folder 'lib', and in the 'lib', I'll keep a 'dbConnect' here. Of course, you can name the file anything, but I want to point out something small here because this is a framework, so file folder names need to be carefully chosen.
+
+I've named this folder 'dbConnect.ts' because we're going to use TypeScript. This is because I want to draw your attention to the name of this 'lib' folder. We will use shadcn in the future, and when you go into the docs and look at the installation section of shadcn, you'll see that it generates a 'utils' file in your system, and this file is generated inside the 'lib' folder.
+
+So, if you've named your folder 'lips' instead of 'lib', remember that a folder named 'lib' is going to come in the future because shadcn will be used. As you gain more experience, these things will become clear. So, name the folder 'lib', not 'lips'. It's a small mistake, or rather a small optimization you can do, but now you know.
+
+We won't be doing shadcn now; we'll do that later. In this video, we'll only focus on the database connection. So let's bring in Mongoose first; it's basic. Now, let's bring in Mongoose.
+
+
+
+//sign up scenarios
+code should effectively handles both scenarios of registering a new user and updating an existing but unverified user account with a new password and verification code.
+
+
+IF existing UserByEmail EXISTS THEN
+    IF existing UserBy Email.is Verified THEN           
+        success: false,
+
+    ELSE
+
+        // Save the updated user
+
+        END IF
+
+    ELSE
+
+        // Create a new user with the provided details
+
+        // Save the new user
+
+    END IF
