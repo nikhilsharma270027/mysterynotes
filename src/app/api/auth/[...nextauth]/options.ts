@@ -19,10 +19,11 @@ export const authOptions: NextAuthOptions = {
                 try {
                     const user = await UserModel.findOne({
                         $or: [
-                            { email: credentials.identifier.email }, // .email but we have es6 feature
-                            { username: credentials.identifier.username }
+                            { email: credentials.email },
+                            { username: credentials.username }
                         ]
-                    })
+                    });
+
                     // if user has not come
                     if (!user) {
                         throw new Error('No user found with this email')
@@ -48,7 +49,7 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user }) {
-            if(user){
+            if (user) {
                 token._id = user._id?.toString();
                 token.isVerified = user.isVerified;
                 token.isAcceptingMessages = user.isAcceptingMessages;
@@ -58,11 +59,11 @@ export const authOptions: NextAuthOptions = {
         },
         // most of the time nextjs works on session based strategy
         async session({ session, token }) {
-            if(token) {
-                session.user._id = token._id
-                session.user.isVerified = token.isVerified
-                session.user.isAcceptingMessages = token.isAcceptingMessages
-                session.user.username = token.username
+            if (token) {
+                session.user._id = token._id;
+                session.user.isVerified = token.isVerified;
+                session.user.isAcceptingMessages = token.isAcceptingMessages;
+                session.user.username = token.username;
             }
             return session
         },

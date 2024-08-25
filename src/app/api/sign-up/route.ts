@@ -17,10 +17,13 @@ export async function POST(request: Request) {
         })
 
         if (existingUserVerifiedByUsername) {
-            return Response.json({
-                success: false, // false if we found the username & is verified , so it cant be registered
-                message: "Username is already taken"
-            }, { status: 400 })
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Username is already taken"
+                }),
+                { status: 400 }
+            );
         }
 
         // now we check new user from email
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
                 const hashedPassword = await bcrypt.hash(password, 10) ;
                 existingUserByEmail.password = hashedPassword;
                 existingUserByEmail.verifyCode = verifyCode;
-                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() * 3600000)
+                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);
                 await existingUserByEmail.save(); 
                 //it will saveuser n jump to sendverification email
             }
