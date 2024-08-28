@@ -3,8 +3,6 @@ import UserModel from "@/model/User";
 import { z } from "zod";
 import { usernameValidation } from "@/Schemas/signUpSchema";
 import { signUpSchema } from "@/Schemas/signUpSchema";
-import { response } from "express";
-import { memoryUsage } from "process";
 
 // query schema
 const UsernameQuerySchema = z.object({
@@ -42,13 +40,11 @@ export async function GET(request: Request) {
         if (!result.success) {
             // using foramt() we can know what r the error
             const usernameErrors = result.error.format().username?._errors || []
-            return Response.json({
+            return new Response(JSON.stringify({
                 success: false,
-                // message: "Error checking username" or
-                message: usernameErrors.length > 0 ? usernameErrors.join(', ') : "invald query parameters"
-            },
-                { status: 400 }
-            )
+                message: usernameErrors.length > 0 ? usernameErrors.join(', ') : "Invalid query parameters"
+            }), { status: 400 });
+            
         }
 
         const { username } = result.data
@@ -65,10 +61,10 @@ export async function GET(request: Request) {
             }, { status: 400 })
         }
 
-        return Response.json({
+        return new Response(JSON.stringify({
             success: true,
-            message: "Username is unique/available"
-        }, { status: 400 })
+            message: "Username is unique"//available
+        }), { status: 200 })
 
     } catch (error) {
         console.error("Error checking username", error);

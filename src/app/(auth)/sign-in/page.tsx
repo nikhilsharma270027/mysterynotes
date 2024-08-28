@@ -4,66 +4,124 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useDebounceValue } from "usehooks-ts";
+import { useDebounceCallback } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
-import { signUpSchema } from "@/Schemas/signUpSchema";
+import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { signInSchema } from "@/Schemas/signInSchema";
+import { signIn } from "next-auth/react";
 
 const page = () => {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   // to check where we have or we dont a unique username
   const [usernameMessage, setUsernameMessage] = useState("");
-  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-  // form submit state
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const debouncedUsername = useDebounceValue(username, 300); //300 MILISECONDS
+  // form submit state
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // the usernmae usestate we take function setUsername from it
+  // const debouncedUsername before
+  // x const debounced = useDebounceCallback(setUsername, 500);// function //300 MILISECONDS
   const { toast } = useToast();
-  const router = useRouter();
+
   // zod implementation
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
-      username: "",
-      email: "",
+      identifier: "",
       password: "",
     },
   });
 
-  // we use useEffect cuz i want when user type username then we debounce that ok but i send request to check wheather there is unique username
-  useEffect(() => {
-    const checkUsernameUnique = async () => {
-      if (debouncedUsername) {
-        setIsCheckingUsername(true);
-        setUsernameMessage("");
-        try {
-          const response = await axios.get(
-            `/api/check-username-unique?username=${debouncedUsername}`
-          );
-          setUsernameMessage(response.data.message);
-        } catch (error) {
-          const axiosError = error as AxiosError<ApiResponse>;
-          setUsernameMessage(
-            axiosError.response?.data.message ?? "Error checking username"
-          );
-        } finally {
-          // below was too be mentioned in both try and catch so to gether we can write in finally, so in both case it will work
-          setIsCheckingUsername(false);
-        }
-      }
-    };
-    checkUsernameUnique();
-  }, [debouncedUsername]);
-
-
   // const onSubmit = async (data) => {
-  const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-      setIsSubmitting(true) // loader state
-      
-  }
-  return <div>page</div>;
+  const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+    const result = await signIn("credentials", {
+      redirect: false,
+      identifier: data.identifier,
+      password: data.password,
+    });
+    if (result?.error) {
+      toast({
+        title: "Login failed",
+        description: "Incorrect username or password",
+        variant: "destructive",
+      });
+    }
+    // in signIn() nextauth redirects to a source but here we will perform our own redirect
+    if (result?.url) {
+      router.replace("/dashboard");
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-800">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+            Join True Feedback
+          </h1>
+          <p className="mb-4">Sign in to start your anonymous adventure</p>
+        </div>
+        <Form {...form}>
+          {/* // form line 27 */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              name="identifier"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email/Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="email/username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* // Password */}
+            <FormField
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* // */}
+            <Button type="submit" >
+              Signin
+            </Button>
+          </form>
+        </Form>
+        <div className="text-center mt-4">
+          <p>
+            Already a member?{" "}
+            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+              Sign <input type="text" name="" id="" />
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default page;
