@@ -1,7 +1,7 @@
 // we need to make messages on user ui, toggle button to check wheather the user is accepting or not accepting the message
 // we need to create one post request to update the state ,
 // secondly get to tell us the state
-// we nned to know the user by session data
+// we need to know the user by session data
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { getServerSession } from "next-auth";
