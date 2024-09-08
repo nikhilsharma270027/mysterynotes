@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
             id: "credentials",
             name: "Credentials",
             credentials: {// here we get actuall access of credebtials
-                email: { label: "Email", type: "text ", placeholder: "jsmith" },
+                email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials: any): Promise<any> {
@@ -19,8 +19,10 @@ export const authOptions: NextAuthOptions = {
                 try {
                     const user = await UserModel.findOne({
                         $or: [
-                            { email: credentials.email },
-                            { username: credentials.username }
+                            { email: credentials.identifier },
+                            { username: credentials.identifier }
+                            // { email: credentials.email },
+                            // { username: credentials.username }
                         ]
                     });
 
@@ -65,6 +67,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.isAcceptingMessages = token.isAcceptingMessages;
                 session.user.username = token.username;
             }
+            console.log(session)
             return session
         },
     },

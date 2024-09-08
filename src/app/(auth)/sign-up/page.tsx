@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-const page = () => {
+export default function SignUpForm(){
   const router = useRouter();
   const [username, setUsername] = useState("");
   // to check where we have or we dont a unique username
@@ -187,7 +187,7 @@ const page = () => {
           <p>
             Already a member?{" "}
             <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
-              Sign <input type="text" name="" id="" />
+              Sign 
             </Link>
           </p>
         </div>
@@ -195,5 +195,3 @@ const page = () => {
     </div>
   );
 };
-
-export default page;

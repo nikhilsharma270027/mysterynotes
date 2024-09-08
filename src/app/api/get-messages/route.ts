@@ -11,9 +11,9 @@ export async function GET(request: Request) {
 
     const session = await getServerSession(authOptions);
 
-    const user: User = session?.user as User;
+    const _user: User = session?.user as User;
 
-    if (!session || !session.user) {
+    if (!session || !_user) {
         return Response.json({
             success: false,
             message: "Not Authenticated"
@@ -24,11 +24,11 @@ export async function GET(request: Request) {
 
 
     //here _id is in string , we convert it to mongooose objetc
-    const userId = new mongoose.Types.ObjectId(user._id);
+    const userId = new mongoose.Types.ObjectId(_user._id);
 
     try {
         const user = await UserModel.aggregate([
-            { $match: { id: userId } },
+            { $match: { _id: userId } }, // Correct field name is _id
             { $unwind: '$messages' },
             { $sort: { 'messages.createdAt': -1 } },
             { $group: { _id: '$_id', messages: { $push: '$messages' } } }

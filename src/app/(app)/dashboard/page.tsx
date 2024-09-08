@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import MessageCard from "@/components/MessageCard"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -9,21 +9,23 @@ import { AcceptMessageSchema } from "@/Schemas/acceptMessageSchema"
 import { ApiResponse } from "@/types/ApiResponse"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios, { AxiosError } from "axios"
-import { response } from "express"
 import { Loader2, RefreshCcw } from "lucide-react"
+import { User } from "next-auth"
 import { useSession } from "next-auth/react"
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 
-const page = () => {
+function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([])
-  const [isloading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+  // const [profileUrl, setProfileUrl] = useState("");
+
 
   const {toast} = useToast();
 
-  const HandleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = (messageId: string) => {
     setMessages(messages.filter((message) => 
       message._id !== messageId
     ))
@@ -56,7 +58,7 @@ const page = () => {
     }
   }, [setValue])
 
-  const fecthMessages = useCallback(async (refresh: boolean = false) => {
+  const fetchMessages = useCallback(async (refresh: boolean = false) => {
      setIsLoading(true)
      setIsSwitchLoading(false)
      try {
@@ -83,10 +85,12 @@ const page = () => {
   }, [setIsLoading, setMessages])
 
   useEffect(() => {
-      if(!session || !session.user) return
-      fecthMessages()
+    if(!session || !session.user) return
+    // const baseUrl = `${window.location.protocol}//${window.location.host}`
+    // setProfileUrl(`${baseUrl}/u/${username}`)
+      fetchMessages()
       fetchAcceptMessage()
-  }, [session, setValue, fetchAcceptMessage, fecthMessages])
+  }, [session, setValue, fetchAcceptMessage, fetchMessages])
 
   // handle switch change
   const handleSwitchChange = async () => {
@@ -109,6 +113,26 @@ const page = () => {
       })
     }
   }
+  
+  // const username = session?.user as User // getting user optionaly using ?
+  const username = (session?.user as User)?.username;
+  // we need to create a hosturl or baseurl is it hosted on vercel or custom host
+  // we need to create url for copy and paste feature
+  // do more research
+  // it is a client component we can use window 
+  //  window.location.protocol means https
+  
+  const baseUrl = `${window.location.protocol}//${window.location.host}`
+  const profileUrl = `${baseUrl}/u/${username}`;
+  
+
+   const copyToClipboard = () => {
+    navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: "URL copied",
+      description: "Profile URL has been copied to clipboard."
+    })
+   }
 
   if(!session || !session.user){
     return <div>Please Login</div>
@@ -177,4 +201,4 @@ const page = () => {
   );
 }
 
-export default page
+export default UserDashboard;

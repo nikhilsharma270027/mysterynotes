@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         // now we check new user from email
         const existingUserByEmail = await UserModel.findOne({ email })
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString()
-
+        console.log(verifyCode)
         if (existingUserByEmail) {
             // true // TODO back here
             if(existingUserByEmail.isVerified){

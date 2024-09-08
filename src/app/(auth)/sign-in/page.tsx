@@ -23,7 +23,7 @@ import { Loader2 } from "lucide-react";
 import { signInSchema } from "@/Schemas/signInSchema";
 import { signIn } from "next-auth/react";
 
-const page = () => {
+export default function SignInForm(){
   const router = useRouter();
   const [username, setUsername] = useState("");
   // to check where we have or we dont a unique username
@@ -52,12 +52,21 @@ const page = () => {
       identifier: data.identifier,
       password: data.password,
     });
+    console.log(result)
     if (result?.error) {
-      toast({
-        title: "Login failed",
-        description: "Incorrect username or password",
-        variant: "destructive",
-      });
+      if (result.error === 'CredentialsSignin') {
+        toast({
+          title: 'Login Failed',
+          description: 'Incorrect username or password',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error,
+          variant: 'destructive',
+        });
+      }
     }
     // in signIn() nextauth redirects to a source but here we will perform our own redirect
     if (result?.url) {
@@ -70,12 +79,11 @@ const page = () => {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join True Feedback
+            Welcome Back to True Feedback
           </h1>
-          <p className="mb-4">Sign in to start your anonymous adventure</p>
+          <p className="mb-4">Sign in to continue your secret conversations</p>
         </div>
         <Form {...form}>
-          {/* // form line 27 */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               name="identifier"
@@ -83,45 +91,34 @@ const page = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email/Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="email/username" {...field} />
-                  </FormControl>
+                  <Input {...field} />
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* // Password */}
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
-                  </FormControl>
+                  <Input type="password" {...field} />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* // */}
-            <Button type="submit" >
-              Signin
-            </Button>
+            <Button className='w-full' type="submit">Sign In</Button>
           </form>
         </Form>
         <div className="text-center mt-4">
           <p>
-            Already a member?{" "}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
-              Sign <input type="text" name="" id="" />
+            Not a member yet?{' '}
+            <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
+              Sign up
             </Link>
           </p>
         </div>
       </div>
     </div>
   );
-};
-
-export default page;
+}
