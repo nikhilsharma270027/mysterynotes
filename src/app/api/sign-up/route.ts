@@ -3,6 +3,7 @@ import UserModel from '@/model/User';
 import bcrypt from "bcryptjs";
 
 import { sendVerificationEmail } from '@/helpers/sendVerificationEmail';
+import { response } from 'express';
 
 export async function POST(request: Request) {
     await dbConnect()// before any action we firstly check db connection
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
         const existingUserByEmail = await UserModel.findOne({ email })
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString()
         console.log(verifyCode)
+        
         if (existingUserByEmail) {
             // true // TODO back here
             if(existingUserByEmail.isVerified){
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
                 existingUserByEmail.verifyCode = verifyCode;
                 existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);
                 await existingUserByEmail.save(); 
+                // return response.json({message: verifyCode})
                 //it will saveuser n jump to sendverification email
             }
         }
@@ -92,7 +95,7 @@ export async function POST(request: Request) {
         // if all is success
         return Response.json({
             success: true,
-            message: "User registered successfullly,. Please verify your email"
+            message: "User registered successfullly,. Please verify your email",
         }, { status: 201 })
 
     } catch (error) {

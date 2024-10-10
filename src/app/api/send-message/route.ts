@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
-import { messageSchema } from "@/Schemas/messageSchema";
 import { Message } from "@/model/User";
 
 export async function POST(request: Request) {
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
             success: true,
             message: "Message sent successfully",
         },
-            { status: 401 }
+            { status: 201 }
         )
     } catch (error) {
         console.log("Error adding messages", error)

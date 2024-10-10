@@ -18,9 +18,10 @@ import { useForm } from "react-hook-form"
 
 function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([])
+  // console.log(messages)
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
-  // const [profileUrl, setProfileUrl] = useState("");
+  const [profileUrl, setProfileUrl] = useState("");
 
 
   const {toast} = useToast();
@@ -56,14 +57,15 @@ function UserDashboard() {
     } finally {
       setIsSwitchLoading(false);
     }
-  }, [setValue])
+  }, [setValue, toast])
 
   const fetchMessages = useCallback(async (refresh: boolean = false) => {
      setIsLoading(true)
      setIsSwitchLoading(false)
      try {
-      const response = await axios.get<ApiResponse>('/api/get-messages')
-      setMessages(response.data.messages || [])
+      const response = await axios.get('/api/get-messages');
+      // console.log(response);
+      setMessages(response.data.message || [])
       if(refresh){
         toast({
           title: "Refreshed Messages",
@@ -82,15 +84,15 @@ function UserDashboard() {
       setIsSwitchLoading(false);
     }
     
-  }, [setIsLoading, setMessages])
+  }, [setIsLoading, setMessages, toast])
 
   useEffect(() => {
     if(!session || !session.user) return
-    // const baseUrl = `${window.location.protocol}//${window.location.host}`
-    // setProfileUrl(`${baseUrl}/u/${username}`)
+    const baseUrl = `${window.location.protocol}//${window.location.host}`
+    setProfileUrl(`${baseUrl}/u/${username}`)
       fetchMessages()
       fetchAcceptMessage()
-  }, [session, setValue, fetchAcceptMessage, fetchMessages])
+  }, [session, setValue, toast, fetchAcceptMessage, fetchMessages])
 
   // handle switch change
   const handleSwitchChange = async () => {
@@ -116,14 +118,15 @@ function UserDashboard() {
   
   // const username = session?.user as User // getting user optionaly using ?
   const username = (session?.user as User)?.username;
+  
   // we need to create a hosturl or baseurl is it hosted on vercel or custom host
   // we need to create url for copy and paste feature
   // do more research
   // it is a client component we can use window 
   //  window.location.protocol means https
   
-  const baseUrl = `${window.location.protocol}//${window.location.host}`
-  const profileUrl = `${baseUrl}/u/${username}`;
+  // const baseUrl = `${window.location.protocol}//${window.location.host}`
+  // const profileUrl = `${baseUrl}/u/${username}`;
   
 
    const copyToClipboard = () => {
@@ -134,14 +137,14 @@ function UserDashboard() {
     })
    }
 
-  if(!session || !session.user){
-    return <div>Please Login</div>
-  }
+  // if(!session || !session.user){
+  //   return <div>Please Login</div>
+  // }
 
 
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
+    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-[#FFBDF7] rounded w-full max-w-6xl">
       <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
 
       <div className="mb-4">
